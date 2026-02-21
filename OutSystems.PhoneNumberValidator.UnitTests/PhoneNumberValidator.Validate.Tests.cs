@@ -85,19 +85,17 @@ namespace OutSystems.PhoneNumberValidator.Tests
             var validator = new Validator();
             validator.PhoneNumberValidate(
                 "+1 650-253-0000", "US",
-                out bool isValid, out bool isPossible, out string type,
-                out string intl, out string national, out string e164,
-                out int code, out string detectedRegion);
+                out PhoneNumberInfo info, out PhoneNumberFormats formats);
 
             Assert.Multiple(() =>
             {
-                Assert.That(isValid, Is.True);
-                Assert.That(isPossible, Is.True);
-                Assert.That(type, Is.Not.Empty);
-                Assert.That(intl, Does.StartWith("+1"));
-                Assert.That(e164, Is.EqualTo("+16502530000"));
-                Assert.That(code, Is.EqualTo(1));
-                Assert.That(detectedRegion, Is.EqualTo("US"));
+                Assert.That(info.IsValid, Is.True);
+                Assert.That(info.IsPossibleNumber, Is.True);
+                Assert.That(info.PhoneNumberType, Is.Not.Empty);
+                Assert.That(info.CountryCode, Is.EqualTo(1));
+                Assert.That(info.DetectedRegionCode, Is.EqualTo("US"));
+                Assert.That(formats.International, Does.StartWith("+1"));
+                Assert.That(formats.E164, Is.EqualTo("+16502530000"));
             });
         }
 
@@ -107,18 +105,16 @@ namespace OutSystems.PhoneNumberValidator.Tests
             var validator = new Validator();
             validator.PhoneNumberValidate(
                 "+351 912 345 678", "",
-                out bool isValid, out bool isPossible, out string type,
-                out string intl, out string national, out string e164,
-                out int code, out string detectedRegion);
+                out PhoneNumberInfo info, out PhoneNumberFormats formats);
 
             Assert.Multiple(() =>
             {
-                Assert.That(isValid, Is.True);
-                Assert.That(isPossible, Is.True);
-                Assert.That(type, Is.EqualTo("MOBILE"));
-                Assert.That(e164, Is.EqualTo("+351912345678"));
-                Assert.That(code, Is.EqualTo(351));
-                Assert.That(detectedRegion, Is.EqualTo("PT"));
+                Assert.That(info.IsValid, Is.True);
+                Assert.That(info.IsPossibleNumber, Is.True);
+                Assert.That(info.PhoneNumberType, Is.EqualTo("MOBILE"));
+                Assert.That(info.CountryCode, Is.EqualTo(351));
+                Assert.That(info.DetectedRegionCode, Is.EqualTo("PT"));
+                Assert.That(formats.E164, Is.EqualTo("+351912345678"));
             });
         }
 
@@ -128,14 +124,12 @@ namespace OutSystems.PhoneNumberValidator.Tests
             var validator = new Validator();
             validator.PhoneNumberValidate(
                 "not-a-number", "US",
-                out bool isValid, out bool isPossible, out string type,
-                out string intl, out string national, out string e164,
-                out int code, out string detectedRegion);
+                out PhoneNumberInfo info, out PhoneNumberFormats formats);
 
             Assert.Multiple(() =>
             {
-                Assert.That(isValid, Is.False);
-                Assert.That(e164, Is.Empty);
+                Assert.That(info.IsValid, Is.False);
+                Assert.That(formats.E164, Is.Empty);
             });
         }
 
@@ -144,9 +138,7 @@ namespace OutSystems.PhoneNumberValidator.Tests
         {
             var validator = new Validator();
             Assert.Throws<ArgumentNullException>(() =>
-                validator.PhoneNumberValidate(
-                    null!, "US",
-                    out _, out _, out _, out _, out _, out _, out _, out _));
+                validator.PhoneNumberValidate(null!, "US", out _, out _));
         }
 
         [Test]
@@ -155,15 +147,13 @@ namespace OutSystems.PhoneNumberValidator.Tests
             var validator = new Validator();
             validator.PhoneNumberValidate(
                 "(650) 253-0000", "US",
-                out bool isValid, out bool isPossible, out string type,
-                out string intl, out string national, out string e164,
-                out int code, out string detectedRegion);
+                out PhoneNumberInfo info, out PhoneNumberFormats formats);
 
             Assert.Multiple(() =>
             {
-                Assert.That(isValid, Is.True);
-                Assert.That(code, Is.EqualTo(1));
-                Assert.That(detectedRegion, Is.EqualTo("US"));
+                Assert.That(info.IsValid, Is.True);
+                Assert.That(info.CountryCode, Is.EqualTo(1));
+                Assert.That(info.DetectedRegionCode, Is.EqualTo("US"));
             });
         }
 
@@ -173,11 +163,9 @@ namespace OutSystems.PhoneNumberValidator.Tests
             var validator = new Validator();
             validator.PhoneNumberValidate(
                 "", "US",
-                out bool isValid, out bool isPossible, out string type,
-                out string intl, out string national, out string e164,
-                out int code, out string detectedRegion);
+                out PhoneNumberInfo info, out PhoneNumberFormats formats);
 
-            Assert.That(isValid, Is.False);
+            Assert.That(info.IsValid, Is.False);
         }
 
         // ── Edge cases: region code handling ──
@@ -188,11 +176,9 @@ namespace OutSystems.PhoneNumberValidator.Tests
             var validator = new Validator();
             validator.PhoneNumberValidate(
                 "(650) 253-0000", "us",
-                out bool isValid, out bool isPossible, out string type,
-                out string intl, out string national, out string e164,
-                out int code, out string detectedRegion);
+                out PhoneNumberInfo info, out PhoneNumberFormats formats);
 
-            Assert.That(isValid, Is.True);
+            Assert.That(info.IsValid, Is.True);
         }
 
         [Test]
@@ -201,11 +187,9 @@ namespace OutSystems.PhoneNumberValidator.Tests
             var validator = new Validator();
             validator.PhoneNumberValidate(
                 "(650) 253-0000", " US ",
-                out bool isValid, out bool isPossible, out string type,
-                out string intl, out string national, out string e164,
-                out int code, out string detectedRegion);
+                out PhoneNumberInfo info, out PhoneNumberFormats formats);
 
-            Assert.That(isValid, Is.True);
+            Assert.That(info.IsValid, Is.True);
         }
 
         [Test]
@@ -214,14 +198,12 @@ namespace OutSystems.PhoneNumberValidator.Tests
             var validator = new Validator();
             validator.PhoneNumberValidate(
                 "+351912345678", null!,
-                out bool isValid, out bool isPossible, out string type,
-                out string intl, out string national, out string e164,
-                out int code, out string detectedRegion);
+                out PhoneNumberInfo info, out PhoneNumberFormats formats);
 
             Assert.Multiple(() =>
             {
-                Assert.That(isValid, Is.True);
-                Assert.That(detectedRegion, Is.EqualTo("PT"));
+                Assert.That(info.IsValid, Is.True);
+                Assert.That(info.DetectedRegionCode, Is.EqualTo("PT"));
             });
         }
 
@@ -231,14 +213,12 @@ namespace OutSystems.PhoneNumberValidator.Tests
             var validator = new Validator();
             validator.PhoneNumberValidate(
                 "+351912345678", "XX",
-                out bool isValid, out bool isPossible, out string type,
-                out string intl, out string national, out string e164,
-                out int code, out string detectedRegion);
+                out PhoneNumberInfo info, out PhoneNumberFormats formats);
 
             Assert.Multiple(() =>
             {
-                Assert.That(isValid, Is.True);
-                Assert.That(detectedRegion, Is.EqualTo("PT"));
+                Assert.That(info.IsValid, Is.True);
+                Assert.That(info.DetectedRegionCode, Is.EqualTo("PT"));
             });
         }
 
@@ -248,11 +228,9 @@ namespace OutSystems.PhoneNumberValidator.Tests
             var validator = new Validator();
             validator.PhoneNumberValidate(
                 "(650) 253-0000", "XX",
-                out bool isValid, out bool isPossible, out string type,
-                out string intl, out string national, out string e164,
-                out int code, out string detectedRegion);
+                out PhoneNumberInfo info, out PhoneNumberFormats formats);
 
-            Assert.That(isValid, Is.False);
+            Assert.That(info.IsValid, Is.False);
         }
 
         [Test]
@@ -261,11 +239,24 @@ namespace OutSystems.PhoneNumberValidator.Tests
             var validator = new Validator();
             validator.PhoneNumberValidate(
                 new string('1', 500), "US",
-                out bool isValid, out bool isPossible, out string type,
-                out string intl, out string national, out string e164,
-                out int code, out string detectedRegion);
+                out PhoneNumberInfo info, out PhoneNumberFormats formats);
 
-            Assert.That(isValid, Is.False);
+            Assert.That(info.IsValid, Is.False);
+        }
+
+        [Test]
+        public void PhoneNumberValidate_ValidNumber_FormatsIncludeRFC3966()
+        {
+            var validator = new Validator();
+            validator.PhoneNumberValidate(
+                "+16502530000", "",
+                out PhoneNumberInfo info, out PhoneNumberFormats formats);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(info.IsValid, Is.True);
+                Assert.That(formats.RFC3966, Is.EqualTo("tel:+1-650-253-0000"));
+            });
         }
     }
 }

@@ -16,7 +16,7 @@ namespace OutSystems.PhoneNumberValidator
         /// Parses and validates a phone number, returning its type and formatted representations.
         /// </summary>
         [OSAction(
-            Description = "Parses and validates a phone number. Returns whether it is valid, its type (MOBILE, FIXED_LINE, TOLL_FREE, etc.), and formatted representations (international, national, E.164). Provide regionCode (e.g., 'US', 'PT', 'GB') when the number is in national format.",
+            Description = "Parses and validates a phone number. Returns validation details (valid, possible, type, country code, region) and formatted representations (international, national, E.164). Provide regionCode (e.g., 'US', 'PT', 'GB') when the number is in national format.",
             IconResourceName = "OutSystems.PhoneNumberValidator.resources.PhoneNumberValidator_icon.png"
         )]
         void PhoneNumberValidate(
@@ -26,29 +26,11 @@ namespace OutSystems.PhoneNumberValidator
             [OSParameterAttribute(Description = "ISO 3166-1 alpha-2 region code (e.g., 'US', 'PT', 'GB'). Required when phone number is in national format. Can be empty when phone number includes country code with '+'.")]
             string regionCode,
 
-            [OSParameterAttribute(Description = "True if the phone number is valid; otherwise false.")]
-            out bool isValid,
+            [OSParameterAttribute(Description = "Validation and identification details for the phone number.")]
+            out PhoneNumberInfo phoneNumberInfo,
 
-            [OSParameterAttribute(Description = "True if the phone number could possibly be valid (less strict than isValid). Useful for partial input validation.")]
-            out bool isPossibleNumber,
-
-            [OSParameterAttribute(Description = "The type of phone number: MOBILE, FIXED_LINE, FIXED_LINE_OR_MOBILE, TOLL_FREE, PREMIUM_RATE, SHARED_COST, VOIP, PERSONAL_NUMBER, PAGER, UAN, VOICEMAIL, or UNKNOWN.")]
-            out string phoneNumberType,
-
-            [OSParameterAttribute(Description = "Phone number in international format (e.g., '+1 650-253-0000').")]
-            out string formattedInternational,
-
-            [OSParameterAttribute(Description = "Phone number in national format (e.g., '(650) 253-0000').")]
-            out string formattedNational,
-
-            [OSParameterAttribute(Description = "Phone number in E.164 format (e.g., '+16502530000'). This is the recommended format for storage.")]
-            out string formattedE164,
-
-            [OSParameterAttribute(Description = "The country calling code (e.g., 1 for US/CA, 351 for PT, 44 for GB). Returns 0 if parsing fails.")]
-            out int countryCode,
-
-            [OSParameterAttribute(Description = "The detected ISO 3166-1 alpha-2 region code for the number (e.g., 'US', 'PT'). May differ from input regionCode. Empty if parsing fails.")]
-            out string detectedRegionCode
+            [OSParameterAttribute(Description = "The phone number in standard formatted representations.")]
+            out PhoneNumberFormats phoneNumberFormats
         );
 
         /// <summary>
@@ -71,17 +53,8 @@ namespace OutSystems.PhoneNumberValidator
             [OSParameterAttribute(Description = "Error message if parsing failed; empty on success.")]
             out string errorMessage,
 
-            [OSParameterAttribute(Description = "Phone number in international format (e.g., '+1 650-253-0000').")]
-            out string formattedInternational,
-
-            [OSParameterAttribute(Description = "Phone number in national format (e.g., '(650) 253-0000').")]
-            out string formattedNational,
-
-            [OSParameterAttribute(Description = "Phone number in E.164 format (e.g., '+16502530000').")]
-            out string formattedE164,
-
-            [OSParameterAttribute(Description = "Phone number in RFC3966 format (e.g., 'tel:+1-650-253-0000'). Useful for 'tel:' hyperlinks.")]
-            out string formattedRFC3966
+            [OSParameterAttribute(Description = "The phone number in standard formatted representations.")]
+            out PhoneNumberFormats phoneNumberFormats
         );
 
         /// <summary>

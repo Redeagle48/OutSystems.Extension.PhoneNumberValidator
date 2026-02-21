@@ -17,26 +17,28 @@ namespace OutSystems.PhoneNumberValidator
         public void PhoneNumberValidate(
             string phoneNumber,
             string regionCode,
-            out bool isValid,
-            out bool isPossibleNumber,
-            out string phoneNumberType,
-            out string formattedInternational,
-            out string formattedNational,
-            out string formattedE164,
-            out int countryCode,
-            out string detectedRegionCode)
+            out PhoneNumberInfo phoneNumberInfo,
+            out PhoneNumberFormats phoneNumberFormats)
         {
             if (phoneNumber is null) throw new ArgumentNullException(nameof(phoneNumber));
             regionCode ??= "";
 
-            isValid = false;
-            isPossibleNumber = false;
-            phoneNumberType = "UNKNOWN";
-            formattedInternational = "";
-            formattedNational = "";
-            formattedE164 = "";
-            countryCode = 0;
-            detectedRegionCode = "";
+            phoneNumberInfo = new PhoneNumberInfo
+            {
+                IsValid = false,
+                IsPossibleNumber = false,
+                PhoneNumberType = "UNKNOWN",
+                CountryCode = 0,
+                DetectedRegionCode = ""
+            };
+
+            phoneNumberFormats = new PhoneNumberFormats
+            {
+                International = "",
+                National = "",
+                E164 = "",
+                RFC3966 = ""
+            };
 
             PhoneNumber number;
             try
@@ -48,17 +50,18 @@ namespace OutSystems.PhoneNumberValidator
                 return;
             }
 
-            isValid = _phoneUtil.IsValidNumber(number);
-            isPossibleNumber = _phoneUtil.IsPossibleNumber(number);
-            phoneNumberType = _phoneUtil.GetNumberType(number).ToString();
-            countryCode = number.CountryCode;
-            detectedRegionCode = _phoneUtil.GetRegionCodeForNumber(number) ?? "";
+            phoneNumberInfo.IsValid = _phoneUtil.IsValidNumber(number);
+            phoneNumberInfo.IsPossibleNumber = _phoneUtil.IsPossibleNumber(number);
+            phoneNumberInfo.PhoneNumberType = _phoneUtil.GetNumberType(number).ToString();
+            phoneNumberInfo.CountryCode = number.CountryCode;
+            phoneNumberInfo.DetectedRegionCode = _phoneUtil.GetRegionCodeForNumber(number) ?? "";
 
             try
             {
-                formattedInternational = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.INTERNATIONAL);
-                formattedNational = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.NATIONAL);
-                formattedE164 = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.E164);
+                phoneNumberFormats.International = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.INTERNATIONAL);
+                phoneNumberFormats.National = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.NATIONAL);
+                phoneNumberFormats.E164 = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.E164);
+                phoneNumberFormats.RFC3966 = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.RFC3966);
             }
             catch (Exception)
             {
@@ -71,20 +74,20 @@ namespace OutSystems.PhoneNumberValidator
             string regionCode,
             out bool success,
             out string errorMessage,
-            out string formattedInternational,
-            out string formattedNational,
-            out string formattedE164,
-            out string formattedRFC3966)
+            out PhoneNumberFormats phoneNumberFormats)
         {
             if (phoneNumber is null) throw new ArgumentNullException(nameof(phoneNumber));
             regionCode ??= "";
 
             success = false;
             errorMessage = "";
-            formattedInternational = "";
-            formattedNational = "";
-            formattedE164 = "";
-            formattedRFC3966 = "";
+            phoneNumberFormats = new PhoneNumberFormats
+            {
+                International = "",
+                National = "",
+                E164 = "",
+                RFC3966 = ""
+            };
 
             PhoneNumber number;
             try
@@ -98,10 +101,10 @@ namespace OutSystems.PhoneNumberValidator
             }
 
             success = true;
-            formattedInternational = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.INTERNATIONAL);
-            formattedNational = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.NATIONAL);
-            formattedE164 = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.E164);
-            formattedRFC3966 = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.RFC3966);
+            phoneNumberFormats.International = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.INTERNATIONAL);
+            phoneNumberFormats.National = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.NATIONAL);
+            phoneNumberFormats.E164 = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.E164);
+            phoneNumberFormats.RFC3966 = _phoneUtil.Format(number, PhoneNumbers.PhoneNumberFormat.RFC3966);
         }
 
         public void PhoneNumberMatch(

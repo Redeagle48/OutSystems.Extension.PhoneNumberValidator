@@ -2,24 +2,43 @@
 
 OutSystems ODC External Library wrapper for Google's [libphonenumber](https://github.com/google/libphonenumber) (C# port: [libphonenumber-csharp](https://github.com/twcclegg/libphonenumber-csharp) v9.0.24). Provides phone number validation, formatting, type detection, region detection, and number matching for international phone numbers.
 
+## Structures
+
+### PhoneNumberInfo
+
+Validation and identification details for a phone number.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| IsValid | Boolean | `True` if the phone number is valid. |
+| IsPossibleNumber | Boolean | `True` if the number could possibly be valid (less strict). Useful for partial input validation. |
+| PhoneNumberType | Text | `MOBILE`, `FIXED_LINE`, `FIXED_LINE_OR_MOBILE`, `TOLL_FREE`, `PREMIUM_RATE`, `SHARED_COST`, `VOIP`, `PERSONAL_NUMBER`, `PAGER`, `UAN`, `VOICEMAIL`, or `UNKNOWN`. |
+| CountryCode | Integer | Country calling code (e.g., `1` for US/CA, `351` for PT, `44` for GB). `0` if parsing fails. |
+| DetectedRegionCode | Text | Detected ISO 3166-1 alpha-2 code (e.g., `US`, `PT`). May differ from input regionCode. |
+
+### PhoneNumberFormats
+
+The phone number in standard formatted representations.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| International | Text | e.g., `+1 650-253-0000` |
+| National | Text | e.g., `(650) 253-0000` |
+| E164 | Text | e.g., `+16502530000` — recommended format for storage. |
+| RFC3966 | Text | e.g., `tel:+1-650-253-0000` — useful for `tel:` hyperlinks. |
+
 ## Actions
 
 ### PhoneNumberValidate
 
-Parses and validates a phone number. Returns whether it is valid, its type, and formatted representations.
+Parses and validates a phone number. Returns validation details and formatted representations.
 
 | Direction | Parameter | Type | Description |
 |-----------|-----------|------|-------------|
 | Input | phoneNumber | Text | The phone number to validate. Accepts international (`+1 650-253-0000`) or national (`(650) 253-0000`) format. |
 | Input | regionCode | Text | ISO 3166-1 alpha-2 code (e.g., `US`, `PT`, `GB`). Required for national format. Can be empty for `+` prefixed numbers. |
-| Output | isValid | Boolean | `True` if the phone number is valid. |
-| Output | isPossibleNumber | Boolean | `True` if the number could possibly be valid (less strict). Useful for partial input validation. |
-| Output | phoneNumberType | Text | `MOBILE`, `FIXED_LINE`, `FIXED_LINE_OR_MOBILE`, `TOLL_FREE`, `PREMIUM_RATE`, `SHARED_COST`, `VOIP`, `PERSONAL_NUMBER`, `PAGER`, `UAN`, `VOICEMAIL`, or `UNKNOWN`. |
-| Output | formattedInternational | Text | e.g., `+1 650-253-0000` |
-| Output | formattedNational | Text | e.g., `(650) 253-0000` |
-| Output | formattedE164 | Text | e.g., `+16502530000` — recommended format for storage. |
-| Output | countryCode | Integer | Country calling code (e.g., `1` for US/CA, `351` for PT, `44` for GB). `0` if parsing fails. |
-| Output | detectedRegionCode | Text | Detected ISO 3166-1 alpha-2 code (e.g., `US`, `PT`). May differ from input regionCode. |
+| Output | phoneNumberInfo | PhoneNumberInfo | Validation and identification details. |
+| Output | phoneNumberFormats | PhoneNumberFormats | The number in all standard formats. |
 
 ### PhoneNumberFormat
 
@@ -31,10 +50,7 @@ Formats a phone number into all standard representations.
 | Input | regionCode | Text | ISO 3166-1 alpha-2 code. Required for national format. |
 | Output | success | Boolean | `True` if the number was parsed and formatted successfully. |
 | Output | errorMessage | Text | Error details on failure; empty on success. |
-| Output | formattedInternational | Text | e.g., `+1 650-253-0000` |
-| Output | formattedNational | Text | e.g., `(650) 253-0000` |
-| Output | formattedE164 | Text | e.g., `+16502530000` |
-| Output | formattedRFC3966 | Text | e.g., `tel:+1-650-253-0000` — useful for `tel:` hyperlinks. |
+| Output | phoneNumberFormats | PhoneNumberFormats | The number in all standard formats. |
 
 ### PhoneNumberMatch
 
@@ -67,7 +83,7 @@ Detects the region (country) and country calling code for a phone number.
 - **regionCode** is an ISO 3166-1 alpha-2 code (e.g., `US`, `PT`, `GB`). It is case-insensitive and whitespace-tolerant — `us`, ` PT ` both work.
 - Provide regionCode when the phone number is in **national format** (no `+` prefix). When the number is in **international format** (e.g., `+351912345678`), regionCode can be left empty.
 - Store phone numbers in **E.164 format** (e.g., `+16502530000`) for best interoperability across systems.
-- Invalid or unparseable phone numbers return `isValid = False` / `success = False` with default output values — they do **not** throw exceptions. Only a `null` phone number input throws an exception.
+- Invalid or unparseable phone numbers return `IsValid = False` / `success = False` with default output values — they do **not** throw exceptions. Only a `null` phone number input throws an exception.
 
 ## Technical Details
 
