@@ -45,8 +45,8 @@ packages/
 ## =========================================================================
 
 # Specific requested patterns
-NetChecksumUtils_Asset.zip
-NetChecksumUtils_v*.zip
+PhoneNumberValidator_Asset.zip
+PhoneNumberValidator_v*.zip
 
 # General safety for all compressed files
 *.zip
@@ -88,3 +88,8 @@ TestResults/
 *.sequenced
 *.coverage
 *.opencoverxml
+
+## =========================================================================
+## Claude Code
+## =========================================================================
+.claude/
